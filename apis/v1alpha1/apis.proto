@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package powermock.apis.v1alpha1;
+option go_package = "apis/v1alpha1;v1alpha1";
+import "google/api/annotations.proto";
+
+// *
+// * [ Conditions ]
+// ** Javascript:
+// function (request: Request): bool {}
+// ** Target:
+// Header, Body, Query, Param
+// ** Operator(WithNot):
+// Exists, Contains, Equal, MatchRegexp, ><=,
+// Match   xxx|xxx|xxx|xxx
+// ---
+// * [ Placeholder ]
+// {{ $request.header.userAgent }}
+// {{ $request.body.xxxxx }}
+// {{ $request.ip }}
+// {{ $fake.nickname }}
+// {{ $fake.phoneNumber }}   lk
+// {{ $fake.address }}
+// {{ $fake.imageUrl }}
+// Go Template ?
+// ...
+//
+// ---
+// * [ Response ]
+// Header
+// Body
+// Grpc Code
+// Latency
+// ---
+// * //
+message MockAPI {
+    message Condition {
+        message SimpleCondition {
+            message Item {
+                string operandX = 1;
+                string operator = 2;
+                string operandY = 3;
+                bool opposite = 4;
+            }
+            repeated Item items = 1;
+            bool useOrAmongItems = 2;
+        }
+        message ScriptCondition {
+            string lang = 1;
+            string content = 2;
+        }
+        oneof Condition {
+            SimpleCondition simple = 1;
+            ScriptCondition script = 2;
+        }
+    }
+    message Response {
+        message SimpleResponse {
+            uint32 code = 1;
+            map<string, string> header = 2;
+            map<string, string> trailer = 3;
+            string body = 4;
+        }
+        message ScriptResponse {
+            string lang = 1;
+            string content = 2;
+        }
+        oneof Response {
+            SimpleResponse simple = 1;
+            ScriptResponse script = 2;
+        }
+    }
+    message Case {
+        Condition condition = 1;
+        Response response = 2;
+    }
+    string uniqueKey = 1;
+    string path = 2;
+    string method = 3;
+    string host = 4;
+    repeated Case cases = 5;
+}
+
+service Mock {
+    rpc SaveMockAPI(SaveMockAPIRequest) returns (SaveMockAPIResponse) {
+        option (google.api.http) = {
+            post: "/mock/save"
+            body: "*"
+        };
+    };
+    rpc DeleteMockAPI(DeleteMockAPIRequest) returns (DeleteMockAPIResponse) {
+        option (google.api.http) = {
+            post: "/mock/delete"
+            body: "*"
+        };
+    };
+    rpc ListMockAPI(ListMockAPIRequest) returns (ListMockAPIResponse) {
+        option (google.api.http) = {
+            post: "/mock/list"
+            body: "*"
+        };
+    };
+}
+
+message SaveMockAPIRequest {
+    MockAPI data = 1;
+}
+message SaveMockAPIResponse {}
+
+message DeleteMockAPIRequest {
+    string uniqueKey = 1;
+}
+message DeleteMockAPIResponse {}
+
+message ListOptions {
+    uint64 page = 1;
+    uint64 limit = 2;
+}
+
+message ListResponse {
+    uint64 total = 1;
+}
+
+message ListMockAPIRequest {
+    string keywords = 1;
+    ListOptions pagination = 2;
+}
+
+message ListMockAPIResponse {
+    repeated MockAPI data = 1;
+    ListResponse pagination = 2;
+}
