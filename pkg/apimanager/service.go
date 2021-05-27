@@ -66,7 +66,7 @@ func NewConfig() *Config {
 	}
 }
 
-// RegisterFlags is used to register flags
+// RegisterFlagsWithPrefix is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
 	f.StringVar(&c.GRPCAddress, prefix+"apiManager.grpcAddress", c.GRPCAddress, "gRPC service listener address")
 	f.StringVar(&c.HTTPAddress, prefix+"apiManager.httpAddress", c.HTTPAddress, "http service listener address")

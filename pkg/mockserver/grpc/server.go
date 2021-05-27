@@ -61,7 +61,7 @@ func (c *Config) IsEnabled() bool {
 	return c.Enable
 }
 
-// RegisterFlags is used to register flags
+// RegisterFlagsWithPrefix is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
 	c.ProtoManager.RegisterFlagsWithPrefix(prefix+"gRPCMockServer.", f)
 	f.BoolVar(&c.Enable, prefix+"gRPCMockServer.enable", c.Enable, "define whether the component is enabled")

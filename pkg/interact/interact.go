@@ -36,9 +36,9 @@ type Request struct {
 
 // Response defines the response structure
 type Response struct {
-	Code    uint32 `json:"code"`
+	Code    uint32            `json:"code"`
 	Header  map[string]string `json:"header"`
-	Body    Message `json:"body"`
+	Body    Message           `json:"body"`
 	Trailer map[string]string `json:"trailer"`
 }
 

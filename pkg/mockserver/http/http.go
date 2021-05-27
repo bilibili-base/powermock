@@ -50,7 +50,7 @@ func (c *Config) IsEnabled() bool {
 	return c.Enable
 }
 
-// RegisterFlags is used to register flags
+// RegisterFlagsWithPrefix is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
 	f.BoolVar(&c.Enable, prefix+"httpMockServer.enable", c.Enable, "define whether the component is enabled")
 	f.StringVar(&c.Address, prefix+"httpMockServer.address", c.Address, "address to listen")

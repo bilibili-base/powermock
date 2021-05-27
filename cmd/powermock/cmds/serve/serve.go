@@ -16,8 +16,8 @@ import (
 var config = internal.NewConfig()
 
 var CmdServe = &cobra.Command{
-	Use:     "serve",
-	Short:   "start the mock server",
+	Use:   "serve",
+	Short: "start the mock server",
 	Run: func(cmd *cobra.Command, args []string) {
 		log, err := logger.New(config.Log, "main", prometheus.DefaultRegisterer)
 		if err != nil {
@@ -40,7 +40,7 @@ var CmdServe = &cobra.Command{
 	},
 }
 
-func init(){
+func init() {
 	configFile := util.ParseConfigFileParameter(os.Args[1:])
 	if configFile != "" {
 		fmt.Printf("start to load config file: %s \r\n", configFile)

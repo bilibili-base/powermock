@@ -31,7 +31,7 @@ func NewPluginConfig() *PluginConfig {
 	}
 }
 
-// RegisterFlags is used to register flags
+// RegisterFlagsWithPrefix is used to register flags
 func (c *PluginConfig) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
 	c.Redis.RegisterFlagsWithPrefix(prefix+"plugin.", f)
 	c.Simple.RegisterFlagsWithPrefix(prefix+"plugin.", f)

@@ -24,7 +24,7 @@ type Plugin struct {
 
 // Config defines the config structure
 type Config struct {
-	Enable  bool
+	Enable bool
 }
 
 // NewConfig is used to init config with default values
@@ -40,7 +40,7 @@ func (c *Config) IsEnabled() bool {
 	return true
 }
 
-// RegisterFlags is used to register flags
+// RegisterFlagsWithPrefix is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
 }
 

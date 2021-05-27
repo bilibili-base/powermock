@@ -33,7 +33,7 @@ func NewConfig() *Config {
 	}
 }
 
-// RegisterFlags is used to register flags
+// RegisterFlagsWithPrefix is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
 	c.Log.RegisterFlagsWithPrefix(prefix, f)
 	c.HTTPMockServer.RegisterFlagsWithPrefix(prefix, f)

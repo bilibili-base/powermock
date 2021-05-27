@@ -52,7 +52,7 @@ func NewConfig() *Config {
 	}
 }
 
-// RegisterFlags is used to register flags
+// RegisterFlagsWithPrefix is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
 	f.StringArrayVar(&c.ProtoImportPaths, prefix+"protoManager.protoImportPaths", c.ProtoImportPaths, "proto import paths")
 	f.StringVar(&c.ProtoDir, prefix+"protoManager.protoDir", c.ProtoDir, "proto dir to load")

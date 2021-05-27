@@ -29,7 +29,7 @@ func NewConfig() *Config {
 	}
 }
 
-// RegisterFlags is used to register flags
+// RegisterFlagsWithPrefix is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
 	f.StringVar(&c.Address, "address", c.Address, "the mock server listen address to call")
 	f.StringVar(&c.File, "file", c.File, "file path, yaml format is supported")

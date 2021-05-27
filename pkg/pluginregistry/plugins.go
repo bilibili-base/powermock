@@ -5,4 +5,3 @@ package pluginregistry
 type Plugin interface {
 	Name() string
 }
-

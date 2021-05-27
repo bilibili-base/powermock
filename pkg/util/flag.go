@@ -47,4 +47,3 @@ func ParseConfigFileParameter(args []string) (configFile string) {
 
 	return
 }
-
