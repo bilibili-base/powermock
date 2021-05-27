@@ -11,10 +11,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/pflag"
 
-	"github.com/storyicon/powermock/pkg/apimanager"
-	"github.com/storyicon/powermock/pkg/interact"
-	"github.com/storyicon/powermock/pkg/util"
-	"github.com/storyicon/powermock/pkg/util/logger"
+	"github.com/bilibili-base/powermock/pkg/apimanager"
+	"github.com/bilibili-base/powermock/pkg/interact"
+	"github.com/bilibili-base/powermock/pkg/util"
+	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
 
 // Provider defines the mock server interface

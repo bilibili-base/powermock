@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/storyicon/powermock/pkg/interact"
+	"github.com/bilibili-base/powermock/pkg/interact"
 )
 
 func TestMatchRequestByJavascript(t *testing.T) {

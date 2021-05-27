@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/storyicon/powermock/examples/advanced/apis"
-	"github.com/storyicon/powermock/pkg/util/logger"
+	"github.com/bilibili-base/powermock/examples/advanced/apis"
+	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
 
 func RequestWithUid(log logger.Logger, client apis.GreeterClient, uid string) {

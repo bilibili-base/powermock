@@ -3,12 +3,12 @@ package internal
 import (
 	"github.com/spf13/pflag"
 
-	pluginsgrpc "github.com/storyicon/powermock/pkg/pluginregistry/grpc"
-	pluginshttp "github.com/storyicon/powermock/pkg/pluginregistry/http"
-	pluginscript "github.com/storyicon/powermock/pkg/pluginregistry/script"
-	pluginssimple "github.com/storyicon/powermock/pkg/pluginregistry/simple"
-	pluginredis "github.com/storyicon/powermock/pkg/pluginregistry/storage/redis"
-	"github.com/storyicon/powermock/pkg/util"
+	pluginsgrpc "github.com/bilibili-base/powermock/pkg/pluginregistry/grpc"
+	pluginshttp "github.com/bilibili-base/powermock/pkg/pluginregistry/http"
+	pluginscript "github.com/bilibili-base/powermock/pkg/pluginregistry/script"
+	pluginssimple "github.com/bilibili-base/powermock/pkg/pluginregistry/simple"
+	pluginredis "github.com/bilibili-base/powermock/pkg/pluginregistry/storage/redis"
+	"github.com/bilibili-base/powermock/pkg/util"
 )
 
 // PluginConfig defines the plugin config

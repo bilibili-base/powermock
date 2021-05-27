@@ -3,7 +3,7 @@ package util
 import (
 	"context"
 
-	"github.com/storyicon/powermock/pkg/util/logger"
+	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
 
 // StartServiceAsync is used to start service async

@@ -5,7 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/storyicon/powermock/pkg/util/logger"
+	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
 
 // RegisterExitHandlers is used to register exit handlers

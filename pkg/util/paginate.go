@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/storyicon/powermock/apis/v1alpha1"
+	"github.com/bilibili-base/powermock/apis/v1alpha1"
 )
 
 // GetPagination is used to make ListOptions safety

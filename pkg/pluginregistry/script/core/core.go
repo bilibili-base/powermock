@@ -7,7 +7,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"rogchap.com/v8go"
 
-	"github.com/storyicon/powermock/pkg/interact"
+	"github.com/bilibili-base/powermock/pkg/interact"
 )
 
 // MatchRequestByJavascript is used to match mock case by javascript

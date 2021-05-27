@@ -12,9 +12,9 @@ import (
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
 
-	"github.com/storyicon/powermock/apis/v1alpha1"
-	"github.com/storyicon/powermock/pkg/util"
-	"github.com/storyicon/powermock/pkg/util/logger"
+	"github.com/bilibili-base/powermock/apis/v1alpha1"
+	"github.com/bilibili-base/powermock/pkg/util"
+	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
 
 type Config struct {

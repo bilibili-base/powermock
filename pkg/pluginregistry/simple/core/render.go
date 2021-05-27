@@ -8,7 +8,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 
-	"github.com/storyicon/powermock/pkg/interact"
+	"github.com/bilibili-base/powermock/pkg/interact"
 )
 
 // Context defines the context

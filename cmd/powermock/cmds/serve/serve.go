@@ -8,9 +8,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cobra"
 
-	"github.com/storyicon/powermock/cmd/powermock/internal"
-	"github.com/storyicon/powermock/pkg/util"
-	"github.com/storyicon/powermock/pkg/util/logger"
+	"github.com/bilibili-base/powermock/cmd/powermock/internal"
+	"github.com/bilibili-base/powermock/pkg/util"
+	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
 
 var config = internal.NewConfig()

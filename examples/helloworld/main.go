@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/storyicon/powermock/examples/helloworld/apis"
+	"github.com/bilibili-base/powermock/examples/helloworld/apis"
 )
 
 func main() {

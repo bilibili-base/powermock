@@ -3,8 +3,8 @@ package pluginregistry
 import (
 	"context"
 
-	"github.com/storyicon/powermock/apis/v1alpha1"
-	"github.com/storyicon/powermock/pkg/interact"
+	"github.com/bilibili-base/powermock/apis/v1alpha1"
+	"github.com/bilibili-base/powermock/pkg/interact"
 )
 
 // MatchPlugin defines matching plugins

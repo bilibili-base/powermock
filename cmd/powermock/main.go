@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cmdsload "github.com/storyicon/powermock/cmd/powermock/cmds/load"
-	cmdsserve "github.com/storyicon/powermock/cmd/powermock/cmds/serve"
+	cmdsload "github.com/bilibili-base/powermock/cmd/powermock/cmds/load"
+	cmdsserve "github.com/bilibili-base/powermock/cmd/powermock/cmds/serve"
 )
 
 // Version is set via build flag -ldflags -X main.Version

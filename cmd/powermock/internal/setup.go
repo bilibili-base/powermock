@@ -5,16 +5,16 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/storyicon/powermock/pkg/apimanager"
-	grpcmockserver "github.com/storyicon/powermock/pkg/mockserver/grpc"
-	httpmockserver "github.com/storyicon/powermock/pkg/mockserver/http"
-	"github.com/storyicon/powermock/pkg/pluginregistry"
-	pluginsgrpc "github.com/storyicon/powermock/pkg/pluginregistry/grpc"
-	pluginshttp "github.com/storyicon/powermock/pkg/pluginregistry/http"
-	pluginscript "github.com/storyicon/powermock/pkg/pluginregistry/script"
-	pluginssimple "github.com/storyicon/powermock/pkg/pluginregistry/simple"
-	pluginredis "github.com/storyicon/powermock/pkg/pluginregistry/storage/redis"
-	"github.com/storyicon/powermock/pkg/util/logger"
+	"github.com/bilibili-base/powermock/pkg/apimanager"
+	grpcmockserver "github.com/bilibili-base/powermock/pkg/mockserver/grpc"
+	httpmockserver "github.com/bilibili-base/powermock/pkg/mockserver/http"
+	"github.com/bilibili-base/powermock/pkg/pluginregistry"
+	pluginsgrpc "github.com/bilibili-base/powermock/pkg/pluginregistry/grpc"
+	pluginshttp "github.com/bilibili-base/powermock/pkg/pluginregistry/http"
+	pluginscript "github.com/bilibili-base/powermock/pkg/pluginregistry/script"
+	pluginssimple "github.com/bilibili-base/powermock/pkg/pluginregistry/simple"
+	pluginredis "github.com/bilibili-base/powermock/pkg/pluginregistry/storage/redis"
+	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
 
 // Startup is used to start up application

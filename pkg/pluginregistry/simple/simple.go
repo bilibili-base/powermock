@@ -9,12 +9,12 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/valyala/fasttemplate"
 
-	"github.com/storyicon/powermock/pkg/pluginregistry"
-	"github.com/storyicon/powermock/pkg/pluginregistry/simple/core"
+	"github.com/bilibili-base/powermock/pkg/pluginregistry"
+	"github.com/bilibili-base/powermock/pkg/pluginregistry/simple/core"
 
-	"github.com/storyicon/powermock/apis/v1alpha1"
-	"github.com/storyicon/powermock/pkg/interact"
-	"github.com/storyicon/powermock/pkg/util/logger"
+	"github.com/bilibili-base/powermock/apis/v1alpha1"
+	"github.com/bilibili-base/powermock/pkg/interact"
+	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
 
 var (

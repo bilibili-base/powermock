@@ -3,12 +3,12 @@ package internal
 import (
 	"github.com/spf13/pflag"
 
-	"github.com/storyicon/powermock/pkg/apimanager"
-	grpcmockserver "github.com/storyicon/powermock/pkg/mockserver/grpc"
-	httpmockserver "github.com/storyicon/powermock/pkg/mockserver/http"
-	"github.com/storyicon/powermock/pkg/pluginregistry"
-	"github.com/storyicon/powermock/pkg/util"
-	"github.com/storyicon/powermock/pkg/util/logger"
+	"github.com/bilibili-base/powermock/pkg/apimanager"
+	grpcmockserver "github.com/bilibili-base/powermock/pkg/mockserver/grpc"
+	httpmockserver "github.com/bilibili-base/powermock/pkg/mockserver/http"
+	"github.com/bilibili-base/powermock/pkg/pluginregistry"
+	"github.com/bilibili-base/powermock/pkg/util"
+	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
 
 // Config defines the powermock config with plugins

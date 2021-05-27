@@ -273,7 +273,7 @@ drwxrwxrwx 1 storyicon storyicon 4.0K May 27 14:23 apis
 syntax = "proto3";
 
 package examples.greeter.api;
-option go_package = "github.com/storyicon/powermock/examples/helloWorld/apis;apis";
+option go_package = "github.com/bilibili-base/powermock/examples/helloWorld/apis;apis";
 
 service Greeter {
     rpc Hello(HelloRequest) returns (HelloResponse);
@@ -398,7 +398,7 @@ starting call mock server
 
 ### 编译
 
-> 为了支持Javascript V8，PowerMock引入了`CGO`，如果你不需要使用`Script插件`，可以手动x修改代码，在 `"cmd/powermock/internal/setup.go"` 中将对 `"github.com/storyicon/powermock/pkg/pluginregistry/script"` 的依赖删除掉，这样你就可以十分丝滑的进行 PowerMock 的编译了。
+> 为了支持Javascript V8，PowerMock引入了`CGO`，如果你不需要使用`Script插件`，可以手动x修改代码，在 `"cmd/powermock/internal/setup.go"` 中将对 `"github.com/bilibili-base/powermock/pkg/pluginregistry/script"` 的依赖删除掉，这样你就可以十分丝滑的进行 PowerMock 的编译了。
 
 如果你是 `Linux/Darwin/wsl` 的用户，推荐使用 makefile 来进行安装：
 ```
