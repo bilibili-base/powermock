@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package examples.greeter.api;
+option go_package = "github.com/storyicon/powermock/examples/helloWorld/apis;apis";
+
+service Greeter {
+    rpc Hello(HelloRequest) returns (HelloResponse);
+}
+
+message HelloRequest {
+    string message = 2;
+}
+
+message HelloResponse {
+    string message = 2;
+}

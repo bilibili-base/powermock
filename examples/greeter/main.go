@@ -13,7 +13,7 @@ import (
 	"github.com/storyicon/powermock/pkg/util/logger"
 )
 
-func Call(log logger.Logger, client apis.GreeterClient, uid string) {
+func RequestWithUid(log logger.Logger, client apis.GreeterClient, uid string) {
 	log.LogInfo(map[string]interface{}{
 		"uid": uid,
 	}, "start to call mock server")
@@ -42,7 +42,7 @@ func main() {
 	}
 	client := apis.NewGreeterClient(conn)
 
-	Call(log, client, "20")
+	RequestWithUid(log, client, "20")
 	fmt.Println(strings.Repeat("-", 20))
-	Call(log, client, "2233")
+	RequestWithUid(log, client, "2233")
 }

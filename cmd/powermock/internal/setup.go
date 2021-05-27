@@ -36,33 +36,27 @@ func Startup(
 		log.LogFatal(nil, "failed to create apiManager: %s", err)
 	}
 
-	log.LogInfo(nil, "* start to create grpcMockServer")
-	grpcMockServer, err := grpcmockserver.New(
-		cfg.GRPCMockServer,
-		apiManager,
-		log,
-		prometheus.DefaultRegisterer,
-	)
-	if err != nil {
-		log.LogFatal(nil, "failed to create gRPCMockServer:", err)
-	}
-
-	log.LogInfo(nil, "* start to create httpMockServer")
-	httpMockServer, err := httpmockserver.New(
-		cfg.HTTPMockServer,
-		apiManager,
-		log,
-		prometheus.DefaultRegisterer,
-	)
-	if err != nil {
-		log.LogFatal(nil, "failed to create httpMockServer: %s", err)
-	}
-
 	var (
 		mockPlugins    []pluginregistry.MockPlugin
 		matchPlugins   []pluginregistry.MatchPlugin
 		storagePlugins []pluginregistry.StoragePlugin
+		httpMockServer httpmockserver.Provider
+		gRPCMockServer grpcmockserver.Provider
 	)
+
+	if cfg.HTTPMockServer.IsEnabled() {
+		log.LogInfo(nil, "* start to create httpMockServer")
+		server, err := httpmockserver.New(
+			cfg.HTTPMockServer,
+			apiManager,
+			log,
+			prometheus.DefaultRegisterer,
+		)
+		if err != nil {
+			log.LogFatal(nil, "failed to create httpMockServer: %s", err)
+		}
+		httpMockServer = server
+	}
 
 	if cfg.Plugin.Redis.IsEnabled() {
 		log.LogInfo(nil, "* start to create plugin(redis)")
@@ -93,13 +87,26 @@ func Startup(
 		matchPlugins = append(matchPlugins, scriptPlugin)
 	}
 
-	if cfg.Plugin.GRPC.IsEnabled() {
-		log.LogInfo(nil, "* start to create plugin(gRPC)")
-		grpcPlugin, err := pluginsgrpc.New(cfg.Plugin.GRPC, grpcMockServer.GetProtoManager().GetMethod, log, registerer)
+	if cfg.GRPCMockServer.IsEnabled() {
+		log.LogInfo(nil, "* start to create grpcMockServer")
+		server, err := grpcmockserver.New(
+			cfg.GRPCMockServer,
+			apiManager,
+			log,
+			prometheus.DefaultRegisterer,
+		)
 		if err != nil {
-			return err
+			log.LogFatal(nil, "failed to create gRPCMockServer:", err)
 		}
-		mockPlugins = append(mockPlugins, grpcPlugin)
+		gRPCMockServer = server
+		if cfg.Plugin.GRPC.IsEnabled() {
+			log.LogInfo(nil, "* start to create plugin(gRPC)")
+			grpcPlugin, err := pluginsgrpc.New(cfg.Plugin.GRPC, server.GetProtoManager().GetMethod, log, registerer)
+			if err != nil {
+				return err
+			}
+			mockPlugins = append(mockPlugins, grpcPlugin)
+		}
 	}
 
 	if cfg.Plugin.HTTP.IsEnabled() {
@@ -110,7 +117,6 @@ func Startup(
 		}
 		mockPlugins = append(mockPlugins, httpPlugin)
 	}
-
 
 	log.LogInfo(nil, "* start to install plugins")
 	if err := pluginRegistry.RegisterMockPlugins(mockPlugins...); err != nil {
@@ -128,14 +134,18 @@ func Startup(
 		return err
 	}
 
-	log.LogInfo(nil, "* start to start gRPCMockServer")
-	if err := grpcMockServer.Start(ctx, cancelFunc); err != nil {
-		return err
+	if cfg.GRPCMockServer.IsEnabled() && gRPCMockServer != nil {
+		log.LogInfo(nil, "* start to start gRPCMockServer")
+		if err := gRPCMockServer.Start(ctx, cancelFunc); err != nil {
+			return err
+		}
 	}
 
-	log.LogInfo(nil, "* start to start httpMockServer")
-	if err := httpMockServer.Start(ctx, cancelFunc); err != nil {
-		return err
+	if cfg.HTTPMockServer.IsEnabled() && httpMockServer != nil {
+		log.LogInfo(nil, "* start to start httpMockServer")
+		if err := httpMockServer.Start(ctx, cancelFunc); err != nil {
+			return err
+		}
 	}
 	return nil
 }

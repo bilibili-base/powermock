@@ -32,18 +32,27 @@ type MockServer struct {
 
 // Config defines the config structure
 type Config struct {
+	Enable  bool
 	Address string
 }
 
 // NewConfig is used to init config with default values
 func NewConfig() *Config {
 	return &Config{
+		Enable:  true,
 		Address: "0.0.0.0:30003",
 	}
 }
 
+// IsEnabled is used to return whether the current component is enabled
+// This attribute is required in pluggable components
+func (c *Config) IsEnabled() bool {
+	return c.Enable
+}
+
 // RegisterFlags is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
+	f.BoolVar(&c.Enable, prefix+"httpMockServer.enable", c.Enable, "define whether the component is enabled")
 	f.StringVar(&c.Address, prefix+"httpMockServer.address", c.Address, "address to listen")
 }
 

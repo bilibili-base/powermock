@@ -1,0 +1,29 @@
+uniqueKey: "hello_example_http"
+path: "/hello"
+method: "GET"
+cases:
+    - response:
+          simple:
+              header:
+                  x-unit-id: "3"
+                  x-unit-region: "sh"
+              trailer:
+                  x-api-version: "1.3.2"
+              body: |
+                  hello world!
+
+---
+
+uniqueKey: "hello_example_gRPC"
+path: "/examples.greeter.api.Greeter/Hello"
+method: "POST"
+cases:
+    - response:
+          simple:
+              header:
+                  x-unit-id: "3"
+                  x-unit-region: "sh"
+              trailer:
+                  x-api-version: "1.3.2"
+              body: |
+                  {"message": "hello world!"}
