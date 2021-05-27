@@ -1,5 +1,5 @@
 # PowerMock 
-[![Go Report Card](https://goreportcard.com/badge/github.com/bilibili-base/powermock?t=1)](https://goreportcard.com/report/github.com/bilibili-base/powermock) [![GoDoc](https://godoc.org/github.com/bilibili-base/powermock?status.svg)](https://godoc.org/github.com/bilibili-base/powermock)
+[![Go Report Card](https://goreportcard.com/badge/github.com/bilibili-base/powermock?t=1)](https://goreportcard.com/report/github.com/bilibili-base/powermock) ![TotalLine](https://img.shields.io/tokei/lines/github/bilibili-base/powermock?color=77%2C199%2C31) ![last-commit](https://img.shields.io/github/last-commit/bilibili-base/powermock) [![GoDoc](https://godoc.org/github.com/bilibili-base/powermock?status.svg)](https://godoc.org/github.com/bilibili-base/powermock) 
 
 **中文** | [English](README_EN.md)
 
