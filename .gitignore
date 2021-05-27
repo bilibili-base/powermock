@@ -2,3 +2,4 @@
 .vscode
 cmd/powermock/powermock
 .playground
+dist

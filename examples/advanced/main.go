@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/storyicon/powermock/examples/greeter/apis"
+	"github.com/storyicon/powermock/examples/advanced/apis"
 	"github.com/storyicon/powermock/pkg/util/logger"
 )
 

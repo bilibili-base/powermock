@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package examples.greeter.api;
-option go_package = "github.com/storyicon/powermock/examples/greeter/apis;apis";
+option go_package = "github.com/storyicon/powermock/examples/advanced/apis;apis";
 
 import "google/protobuf/duration.proto";
 import "google/protobuf/any.proto";

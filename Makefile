@@ -8,15 +8,30 @@ PROTO_FILES=$(shell find . -name *.proto)
 # Generate binaries for a powermock release
 .PHONY: build
 build:
-	rm -fr ./dist
+	make build_linux
+	make build_windows
+	make build_darwin
+
+.PHONY: build_linux
+build_linux:
+	rm -fr ./dist/powermock-linux-amd64
 	mkdir -p ./dist
-	GOOS="windows"  GOARCH="amd64" CGO_ENABLED=0 go build $(GO_FLAGS) -o ./dist/powermock-windows-amd64.exe   ./cmd/powermock
-	GOOS="linux"  GOARCH="amd64" CGO_ENABLED=0 go build $(GO_FLAGS) -o ./dist/powermock-linux-amd64   ./cmd/powermock
-	GOOS="darwin" GOARCH="amd64" CGO_ENABLED=0 go build $(GO_FLAGS) -o ./dist/powermock-darwin-amd64  ./cmd/powermock
-	shasum -a 256 ./dist/powermock-windows-amd64.exe | cut -d ' ' -f 1 > ./dist/powermock-windows-amd64-sha-256
-	shasum -a 256 ./dist/powermock-darwin-amd64 | cut -d ' ' -f 1 > ./dist/powermock-darwin-amd64-sha-256
+	GOOS="linux"  GOARCH="amd64" CGO_ENABLED=1 go build $(GO_FLAGS) -o ./dist/powermock-linux-amd64   ./cmd/powermock
 	shasum -a 256 ./dist/powermock-linux-amd64  | cut -d ' ' -f 1 > ./dist/powermock-linux-amd64-sha-256
-	cp ./dist/powermock-linux-amd64   ./cmd/powermock/powermock
+
+.PHONY: build_windows
+build_windows:
+	rm -fr ./dist/powermock-windows-amd64
+	mkdir -p ./dist
+	GOOS="windows"  GOARCH="amd64" CGO_ENABLED=1 go build $(GO_FLAGS) -o ./dist/powermock-windows-amd64   ./cmd/powermock
+	shasum -a 256 ./dist/powermock-windows-amd64  | cut -d ' ' -f 1 > ./dist/powermock-windows-amd64-sha-256
+
+.PHONY: build_darwin
+build_darwin:
+	rm -fr ./dist/powermock-darwin-amd64
+	mkdir -p ./dist
+	GOOS="darwin"  GOARCH="amd64" CGO_ENABLED=1 go build $(GO_FLAGS) -o ./dist/powermock-darwin-amd64   ./cmd/powermock
+	shasum -a 256 ./dist/powermock-darwin-amd64  | cut -d ' ' -f 1 > ./dist/powermock-darwin-amd64-sha-256
 
 .PHONY: proto
 proto:
