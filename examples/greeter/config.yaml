@@ -1,0 +1,25 @@
+log:
+    pretty: true
+    level: debug
+grpcmockserver:
+    address: 0.0.0.0:30002
+    protomanager:
+        protoimportpaths: [ ]
+        protodir: ./apis
+httpmockserver:
+    address: 0.0.0.0:30003
+apimanager:
+    grpcaddress: 0.0.0.0:30000
+    httpaddress: 0.0.0.0:30001
+pluginregistry: { }
+plugin:
+    simple: { }
+    grpc: { }
+    http: { }
+    script: { }
+    redis:
+        enable: false
+        addr: 127.0.0.1:6379
+        password: ""
+        db: 0
+        prefix: /powermock/

@@ -158,5 +158,5 @@ var _Mock_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "apis/v1alpha1/apis.proto",
+	Metadata: "apis.proto",
 }

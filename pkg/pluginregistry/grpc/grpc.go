@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/jsonpb"
+	"github.com/hashicorp/go-multierror"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
 	"github.com/prometheus/client_golang/prometheus"
@@ -13,8 +14,11 @@ import (
 
 	"github.com/storyicon/powermock/apis/v1alpha1"
 	"github.com/storyicon/powermock/pkg/interact"
+	"github.com/storyicon/powermock/pkg/pluginregistry"
 	"github.com/storyicon/powermock/pkg/util/logger"
 )
+
+var _ pluginregistry.MockPlugin = &Plugin{}
 
 // MethodDescGetter is used to obtain the MethodDescriptor corresponding to a given method
 type MethodDescGetter func(method string) (*desc.MethodDescriptor, bool)
@@ -29,16 +33,25 @@ type Plugin struct {
 }
 
 // Config defines the config structure
-type Config struct {}
+type Config struct {
+	Enable  bool
+}
 
 // NewConfig is used to init config with default values
 func NewConfig() *Config {
-	return &Config{}
+	return &Config{
+		Enable: true,
+	}
+}
+
+// IsEnabled is used to return whether the current component is enabled
+// This attribute is required in pluggable components
+func (c *Config) IsEnabled() bool {
+	return true
 }
 
 // RegisterFlags is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
-
 }
 
 // Validate is used to validate config and returns error on failure
@@ -48,6 +61,9 @@ func (c *Config) Validate() error {
 
 // New is used to init service
 func New(cfg *Config, methodDescGetter MethodDescGetter, logger logger.Logger, registerer prometheus.Registerer) (*Plugin, error) {
+	if methodDescGetter == nil {
+		return nil, errors.New("method descriptor getter is required")
+	}
 	service := &Plugin{
 		cfg:              cfg,
 		methodDescGetter: methodDescGetter,
@@ -67,9 +83,6 @@ func (s *Plugin) MockResponse(ctx context.Context, mock *v1alpha1.MockAPI_Respon
 	if request.Protocol != interact.ProtocolGRPC {
 		return false, nil
 	}
-	if s.methodDescGetter == nil {
-		return false, errors.New("desc getter is required")
-	}
 	md, ok := s.methodDescGetter(request.Path)
 	if !ok {
 		return true, fmt.Errorf("unable to find descriptor: %s", request.Path)
@@ -77,11 +90,11 @@ func (s *Plugin) MockResponse(ctx context.Context, mock *v1alpha1.MockAPI_Respon
 	data := response.Body.Bytes()
 	message := dynamic.NewMessage(md.GetOutputType())
 	if err := message.UnmarshalJSONPB(&jsonpb.Unmarshaler{}, data); err != nil {
-		return true, err
+		return true, multierror.Prefix(err, "failed to unmarshal:")
 	}
 	binaryData, err := message.Marshal()
 	if err != nil {
-		return true, err
+		return true, multierror.Prefix(err, "failed to marshal:")
 	}
 	response.Body = interact.NewBytesMessage(binaryData)
 	return false, nil

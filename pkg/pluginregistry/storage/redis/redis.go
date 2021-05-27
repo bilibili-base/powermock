@@ -23,6 +23,7 @@ type Plugin struct {
 
 // Config defines the config structure
 type Config struct {
+	Enable   bool
 	Addr     string
 	Password string
 	DB       int
@@ -32,13 +33,21 @@ type Config struct {
 // NewConfig is used to init config with default values
 func NewConfig() *Config {
 	return &Config{
+		Enable: false,
 		Addr:   "127.0.0.1:6379",
 		Prefix: "/powermock/",
 	}
 }
 
+// IsEnabled is used to return whether the current component is enabled
+// This attribute is required in pluggable components
+func (c *Config) IsEnabled() bool {
+	return c.Enable
+}
+
 // RegisterFlags is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
+	f.BoolVar(&c.Enable, prefix+"redis.enable", c.Enable, "define whether the component is enabled")
 	f.StringVar(&c.Addr, prefix+"redis.addr", c.Addr, "redis address(ip:port format)")
 	f.StringVar(&c.Password, prefix+"redis.password", c.Password, "redis password")
 	f.IntVar(&c.DB, prefix+"redis.db", c.DB, "redis database to use")

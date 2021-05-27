@@ -161,7 +161,7 @@ func (s *Manager) ListMockAPI(ctx context.Context, request *v1alpha1.ListMockAPI
 	sort.Strings(uniqueKeys)
 
 	pagination := util.GetPagination(request.GetPagination())
-	if err := util.PaginateSlice(pagination, uniqueKeys); err != nil {
+	if err := util.PaginateSlice(pagination, &uniqueKeys); err != nil {
 		return nil, err
 	}
 

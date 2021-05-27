@@ -3,6 +3,7 @@ syntax = "proto3";
 package powermock.apis.v1alpha1;
 option go_package = "apis/v1alpha1;v1alpha1";
 import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
 
 // *
 // * [ Conditions ]
@@ -64,6 +65,7 @@ message MockAPI {
         message ScriptResponse {
             string lang = 1;
             string content = 2;
+            google.protobuf.Duration timeout = 3;
         }
         oneof Response {
             SimpleResponse simple = 1;

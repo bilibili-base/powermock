@@ -45,10 +45,11 @@ func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
 
 // Validate is used to validate config and returns error on failure
 func (c *Config) Validate() error {
-	return util.CheckErrors(
-		c.PluginRegistry.Validate(),
-		c.GRPCMockServer.Validate(),
-		c.HTTPMockServer.Validate(),
-		c.ApiManager.Validate(),
-		c.Plugin.Validate())
+	return util.ValidateConfigs(
+		c.PluginRegistry,
+		c.GRPCMockServer,
+		c.HTTPMockServer,
+		c.ApiManager,
+		c.Plugin,
+	)
 }

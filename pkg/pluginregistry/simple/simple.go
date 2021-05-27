@@ -9,11 +9,17 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/valyala/fasttemplate"
 
+	"github.com/storyicon/powermock/pkg/pluginregistry"
 	"github.com/storyicon/powermock/pkg/pluginregistry/simple/core"
 
 	"github.com/storyicon/powermock/apis/v1alpha1"
 	"github.com/storyicon/powermock/pkg/interact"
 	"github.com/storyicon/powermock/pkg/util/logger"
+)
+
+var (
+	_ pluginregistry.MockPlugin = &Plugin{}
+	_ pluginregistry.MatchPlugin = &Plugin{}
 )
 
 // Plugin defines the most basic matching and Mock plug-ins
@@ -25,16 +31,25 @@ type Plugin struct {
 }
 
 // Config defines the config structure
-type Config struct {}
+type Config struct {
+	Enable  bool
+}
 
 // NewConfig is used to init config with default values
 func NewConfig() *Config {
-	return &Config{}
+	return &Config{
+		Enable: true,
+	}
+}
+
+// IsEnabled is used to return whether the current component is enabled
+// This attribute is required in pluggable components
+func (c *Config) IsEnabled() bool {
+	return true
 }
 
 // RegisterFlags is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
-
 }
 
 // Validate is used to validate config and returns error on failure

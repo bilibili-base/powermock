@@ -1,16 +1,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"os"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cobra"
 
-	"github.com/storyicon/powermock/cmd/powermock/internal"
-	"github.com/storyicon/powermock/pkg/util"
-	"github.com/storyicon/powermock/pkg/util/logger"
+	cmdsload "github.com/storyicon/powermock/cmd/powermock/cmds/load"
+	cmdsserve "github.com/storyicon/powermock/cmd/powermock/cmds/serve"
 )
 
 // Version is set via build flag -ldflags -X main.Version
@@ -34,53 +30,17 @@ Powered by: storyicon
 
 `
 
-var config = internal.NewConfig()
-var cmd = cobra.Command{
-	Use:     "",
-	Version: fmt.Sprintf(`Version: %s, Branch: %s, Revision: %s, BuildDate: %s`, Version, Branch, Revision, BuildDate),
-	Short:   "",
+var cmdRoot = &cobra.Command{
+	Use:     "powermock",
+	Short:   "powermock",
+	Version: fmt.Sprintf("%s, branch: %s, revision: %s, buildDate: %s", Version, Branch, Revision, BuildDate),
 	Run: func(cmd *cobra.Command, args []string) {
-		log, err := logger.New(config.Log, "main", prometheus.DefaultRegisterer)
-		if err != nil {
-			panic(err)
-		}
 		fmt.Println(asciiImage)
-
-		ctx, cancel := context.WithCancel(context.Background())
-		stop := util.RegisterExitHandlers(log, cancel)
-		defer cancel()
-
-		util.DumpYaml(config)
-
-		if err := config.Validate(); err != nil {
-			log.LogFatal(nil, "failed to validate config: %s", err)
-		}
-
-		log.LogInfo(map[string]interface{}{
-			"version":   Version,
-			"branch":    Branch,
-			"revision":  Revision,
-			"buildDate": BuildDate,
-		}, "Welcome to PowerMock")
-		if err := internal.Startup(ctx, cancel, config, log, prometheus.DefaultRegisterer); err != nil {
-			log.LogFatal(nil, "oops, an error has occurred: %s", err)
-		}
-		<-stop
-		log.LogInfo(nil, "Goodbye")
+		_ = cmd.Help()
 	},
 }
 
 func main() {
-	configFile := util.ParseConfigFileParameter(os.Args[1:])
-	if configFile != "" {
-		fmt.Printf("start to load config file: %s \r\n", configFile)
-		if err := util.LoadConfig(configFile, &config); err != nil {
-			fmt.Printf("error loading config from %s: %v\n", configFile, err)
-			os.Exit(1)
-		}
-	}
-	flagSet := cmd.PersistentFlags()
-	util.IgnoredFlag(flagSet, "config.file", "")
-	config.RegisterFlagsWithPrefix("", flagSet)
-	_ = cmd.Execute()
+	cmdRoot.AddCommand(cmdsserve.CmdServe, cmdsload.CmdLoad)
+	_ = cmdRoot.Execute()
 }
