@@ -1,4 +1,4 @@
-# PowerMock
+# PowerMock [![Go Report Card](https://goreportcard.com/badge/github.com/bilibili-base/powermock)](https://goreportcard.com/report/github.com/bilibili-base/powermock) [![GoDoc](https://godoc.org/github.com/bilibili-base/powermock?status.svg)](https://godoc.org/github.com/bilibili-base/powermock)
 **中文** | [English](README_EN.md)
 
 ![logo](./docs/images/logo.png)
@@ -6,7 +6,7 @@
 PowerMock是一个Mock Server的实现，它同时支持HTTP与gRPC协议接口的Mock，并提供了灵活的插件功能。
 这个工具面向于前后端、测试等对有接口Mock需求的开发人员，也可以作为一个通用的Mock服务，部署在网关架构或API管理平台中，实现降级、接口Mock等功能。
 
-- [PowerMock](#powermock)
+- [PowerMock ![Go Report Card](https://goreportcard.com/report/github.com/bilibili-base/powermock)  [![Coverage Status](https://coveralls.io/repos/github/bilibili-base/powermock/badge.svg)](https://coveralls.io/github/bilibili-base/powermock) [![GoDoc](https://godoc.org/github.com/bilibili-base/powermock?status.svg)](https://godoc.org/github.com/bilibili-base/powermock) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/bilibili-base/Lobby)](#powermock-----)
   - [功能](#功能)
   - [示例](#示例)
     - [一、较为高级的用法](#一较为高级的用法)
@@ -396,7 +396,7 @@ starting call mock server
 
 ### 编译
 
-> 为了支持Javascript V8，PowerMock引入了`CGO`，如果你不需要使用`Script插件`，可以手动x修改代码，在 `cmd/powermock/internal/setup.go` 中将对 `"github.com/storyicon/powermock/pkg/pluginregistry/script"` 的依赖删除掉，这样你就可以十分丝滑的进行PowerMock的编译了。
+> 为了支持Javascript V8，PowerMock引入了`CGO`，如果你不需要使用`Script插件`，可以手动x修改代码，在 `"cmd/powermock/internal/setup.go"` 中将对 `"github.com/storyicon/powermock/pkg/pluginregistry/script"` 的依赖删除掉，这样你就可以十分丝滑的进行 PowerMock 的编译了。
 
 如果你是 `Linux/Darwin/wsl` 的用户，推荐使用 makefile 来进行安装：
 ```
