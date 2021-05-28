@@ -1,4 +1,4 @@
 # PowerMock
-[中文](REAMDE.md) | **English**
+[中文](README.md) | **English**
 
-> English version is on the way.
+> The English version is on the way.
