@@ -27,4 +27,11 @@ type StoragePlugin interface {
 	Delete(ctx context.Context, key string) error
 	// List is used to list all key-val pairs in storage
 	List(ctx context.Context) (map[string]string, error)
+	// GetAnnouncement is used to get announcement
+	// When events such as DELETE/SET are monitored,
+	// the chan returned by GetAnnouncement will be able to read the event.
+	// GetAnnouncement can only be called once
+	GetAnnouncement() chan struct{}
+	// Start is used to start the storage plugin
+	Start(ctx context.Context, cancelFunc context.CancelFunc) error
 }

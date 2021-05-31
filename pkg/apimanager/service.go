@@ -37,6 +37,7 @@ import (
 	"github.com/bilibili-base/powermock/apis/v1alpha1"
 	"github.com/bilibili-base/powermock/pkg/interact"
 	"github.com/bilibili-base/powermock/pkg/pluginregistry"
+	"github.com/bilibili-base/powermock/pkg/pluginregistry/storage/memory"
 	"github.com/bilibili-base/powermock/pkg/util"
 	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
@@ -53,13 +54,17 @@ type Provider interface {
 type Manager struct {
 	cfg *Config
 
+	storage        pluginregistry.StoragePlugin
 	pluginRegistry pluginregistry.Registry
 	// does not support deletion
 	// https://github.com/gorilla/mux/issues/82
-	mux     *mux.Router
-	muxLock sync.RWMutex
+	// readonly
+	mux *mux.Router
 	// map[uniqueKey]*v1alpha1.MockAPI
-	apis sync.Map
+	// readonly
+	apis map[string]*v1alpha1.MockAPI
+	// used to protect the pointer of mux, apis
+	lock sync.RWMutex
 
 	v1alpha1.UnimplementedMockServer
 	registerer prometheus.Registerer
@@ -103,6 +108,7 @@ func New(cfg *Config,
 		registerer:     registerer,
 		pluginRegistry: pluginRegistry,
 		mux:            mux.NewRouter(),
+		apis:           map[string]*v1alpha1.MockAPI{},
 		Logger:         logger.NewLogger("apiManager"),
 	}
 	return service, nil
@@ -110,6 +116,9 @@ func New(cfg *Config,
 
 // Start is used to start the service
 func (s *Manager) Start(ctx context.Context, cancelFunc context.CancelFunc) error {
+	if err := s.setupStorage(); err != nil {
+		return err
+	}
 	if err := s.loadAPIs(ctx); err != nil {
 		return err
 	}
@@ -119,6 +128,7 @@ func (s *Manager) Start(ctx context.Context, cancelFunc context.CancelFunc) erro
 	if err := s.setupHTTPServer(ctx, cancelFunc); err != nil {
 		return err
 	}
+	s.setupAnnouncementReceiver(ctx, cancelFunc)
 	return nil
 }
 
@@ -128,49 +138,43 @@ func (s *Manager) SaveMockAPI(ctx context.Context, request *v1alpha1.SaveMockAPI
 	if api == nil {
 		return nil, errors.New("api is nil")
 	}
-	if storage := s.getStorage(); storage != nil {
-		var encoder jsonpb.Marshaler
-		data, err := encoder.MarshalToString(api)
-		if err != nil {
-			return nil, err
-		}
-		if err := storage.Set(ctx, api.GetUniqueKey(), data); err != nil {
-			return nil, err
-		}
+	var encoder jsonpb.Marshaler
+	data, err := encoder.MarshalToString(api)
+	if err != nil {
+		return nil, err
 	}
-	s.apis.Store(api.GetUniqueKey(), api)
-	s.buildMux()
+	if err := s.storage.Set(ctx, api.GetUniqueKey(), data); err != nil {
+		return nil, err
+	}
 	return &v1alpha1.SaveMockAPIResponse{}, nil
 }
 
 // DeleteMockAPI is used to delete MockAPI
 func (s *Manager) DeleteMockAPI(ctx context.Context, request *v1alpha1.DeleteMockAPIRequest) (*v1alpha1.DeleteMockAPIResponse, error) {
 	uniqueKey := request.GetUniqueKey()
-	if storage := s.getStorage(); storage != nil {
-		if err := storage.Delete(ctx, uniqueKey); err != nil {
-			return nil, err
-		}
+	if err := s.storage.Delete(ctx, uniqueKey); err != nil {
+		return nil, err
 	}
-	s.apis.Delete(uniqueKey)
-	s.buildMux()
 	return &v1alpha1.DeleteMockAPIResponse{}, nil
 }
 
 // ListMockAPI is used to list MockAPIs
 func (s *Manager) ListMockAPI(ctx context.Context, request *v1alpha1.ListMockAPIRequest) (*v1alpha1.ListMockAPIResponse, error) {
+	s.lock.RLock()
+	apis := s.apis
+	s.lock.RUnlock()
+
 	var total uint64
 	var uniqueKeys []string
-
 	keywords := request.GetKeywords()
-	s.apis.Range(func(key, value interface{}) bool {
-		mockAPI := value.(*v1alpha1.MockAPI)
+
+	for _, mockAPI := range apis {
 		total++
 		if keywords != "" && !strings.Contains(mockAPI.GetUniqueKey(), keywords) {
-			return true
+			continue
 		}
 		uniqueKeys = append(uniqueKeys, mockAPI.GetUniqueKey())
-		return true
-	})
+	}
 
 	sort.Strings(uniqueKeys)
 
@@ -181,7 +185,7 @@ func (s *Manager) ListMockAPI(ctx context.Context, request *v1alpha1.ListMockAPI
 
 	data := make([]*v1alpha1.MockAPI, 0, len(uniqueKeys))
 	for _, key := range uniqueKeys {
-		mockAPI, ok := s.getAPIByUniqueKey(key)
+		mockAPI, ok := apis[key]
 		if ok {
 			data = append(data, mockAPI)
 		}
@@ -193,10 +197,13 @@ func (s *Manager) ListMockAPI(ctx context.Context, request *v1alpha1.ListMockAPI
 
 // MatchAPI is used to match MockAPI
 func (s *Manager) MatchAPI(host, path, method string) (*v1alpha1.MockAPI, bool) {
-	s.muxLock.RLock()
-	defer s.muxLock.RUnlock()
+	s.lock.RLock()
+	m := s.mux
+	apis := s.apis
+	s.lock.RUnlock()
+
 	var match mux.RouteMatch
-	matched := s.mux.Match(&http.Request{
+	matched := m.Match(&http.Request{
 		Method: method,
 		URL:    &url.URL{Path: path},
 		Host:   host,
@@ -204,7 +211,12 @@ func (s *Manager) MatchAPI(host, path, method string) (*v1alpha1.MockAPI, bool) 
 	if !matched {
 		return nil, false
 	}
-	return s.getAPIByUniqueKey(match.Route.GetName())
+
+	api := apis[match.Route.GetName()]
+	if api != nil {
+		return api, true
+	}
+	return nil, false
 }
 
 // MockResponse is used to mock response
@@ -228,6 +240,20 @@ func (s *Manager) MockResponse(ctx context.Context, request *interact.Request) (
 		}
 	}
 	return response, nil
+}
+
+func (s *Manager) setupStorage() error {
+	storagePlugin := s.pluginRegistry.StoragePlugin()
+	if storagePlugin != nil {
+		s.storage = storagePlugin
+		return nil
+	}
+	storage, err := memory.New(memory.NewConfig(), s.NewLogger(".memory"), s.registerer)
+	if err != nil {
+		return err
+	}
+	s.storage = storage
+	return nil
 }
 
 func (s *Manager) setupHTTPServer(ctx context.Context, cancelFunc func()) error {
@@ -274,59 +300,52 @@ func (s *Manager) setupGRPCServer(ctx context.Context, cancelFunc func()) error 
 	return nil
 }
 
-func (s *Manager) getStorage() pluginregistry.StoragePlugin {
-	storages := s.pluginRegistry.StoragePlugins()
-	if len(storages) > 0 {
-		return storages[0]
-	}
-	return nil
+func (s *Manager) setupAnnouncementReceiver(ctx context.Context, cancelFunc func()) {
+	util.StartServiceAsync(ctx, cancelFunc, s.Logger, func() error {
+		for {
+			select {
+			case _, ok := <-s.storage.GetAnnouncement():
+				if !ok {
+					s.LogWarn(nil, "storage announcement closed")
+					return nil
+				}
+				s.LogInfo(nil, "storage announcement received")
+				if err := s.loadAPIs(ctx); err != nil {
+					s.LogError(nil, "failed to load apis: %s", err)
+				}
+			case <-ctx.Done():
+				s.LogWarn(nil, "apiManager stops watching announcements")
+				return nil
+			}
+		}
+	}, func() error {
+		return nil
+	})
 }
 
 func (s *Manager) loadAPIs(ctx context.Context) error {
-	if storage := s.getStorage(); storage != nil {
-		pairs, err := storage.List(ctx)
-		if err != nil {
-			return err
-		}
-		s.LogInfo(nil, "load apis from storage, total %d", len(pairs))
-		for key, val := range pairs {
-			var api v1alpha1.MockAPI
-			if err := jsonpb.UnmarshalString(val, &api); err != nil {
-				return fmt.Errorf("failed to load(%s): %s", key, err)
-			}
-			s.apis.Store(key, &api)
-			s.LogInfo(map[string]interface{}{
-				"uniqueKey": api.GetUniqueKey(),
-				"path":      api.GetPath(),
-			}, "apis is loaded")
-		}
-		s.buildMux()
+	pairs, err := s.storage.List(ctx)
+	if err != nil {
+		return err
 	}
+	apis := map[string]*v1alpha1.MockAPI{}
+	s.LogInfo(nil, "load apis from storage, total %d", len(pairs))
+	for key, val := range pairs {
+		var api v1alpha1.MockAPI
+		if err := jsonpb.UnmarshalString(val, &api); err != nil {
+			return fmt.Errorf("failed to load(%s): %s", key, err)
+		}
+		apis[key] = &api
+		s.LogInfo(map[string]interface{}{
+			"uniqueKey": api.GetUniqueKey(),
+			"path":      api.GetPath(),
+		}, "apis is loaded")
+	}
+	s.lock.Lock()
+	s.apis = apis
+	s.mux = buildMux(apis, s.Logger)
+	s.lock.Unlock()
 	return nil
-}
-
-func (s *Manager) buildMux() {
-	router := mux.NewRouter()
-	s.apis.Range(func(key, value interface{}) bool {
-		mockAPI := value.(*v1alpha1.MockAPI)
-		if err := addAPI(router, mockAPI); err != nil {
-			s.LogWarn(map[string]interface{}{
-				"uniqueKey": mockAPI.GetUniqueKey(),
-			}, "failed to add api when buildMux: %s", err)
-		}
-		return true
-	})
-	s.muxLock.Lock()
-	s.mux = router
-	s.muxLock.Unlock()
-}
-
-func (s *Manager) getAPIByUniqueKey(key string) (*v1alpha1.MockAPI, bool) {
-	val, ok := s.apis.Load(key)
-	if !ok {
-		return nil, false
-	}
-	return val.(*v1alpha1.MockAPI), true
 }
 
 func (s *Manager) getMatchedCase(ctx context.Context, request *interact.Request, api *v1alpha1.MockAPI) (*v1alpha1.MockAPI_Case, error) {
@@ -346,6 +365,18 @@ func (s *Manager) getMatchedCase(ctx context.Context, request *interact.Request,
 		}
 	}
 	return nil, status.Error(codes.NotFound, "no case matched")
+}
+
+func buildMux(apis map[string]*v1alpha1.MockAPI, log logger.Logger) *mux.Router {
+	router := mux.NewRouter()
+	for _, mockAPI := range apis {
+		if err := addAPI(router, mockAPI); err != nil {
+			log.LogWarn(map[string]interface{}{
+				"uniqueKey": mockAPI.GetUniqueKey(),
+			}, "failed to add api when buildMux: %s", err)
+		}
+	}
+	return router
 }
 
 func addAPI(router *mux.Router, api *v1alpha1.MockAPI) error {

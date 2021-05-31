@@ -36,20 +36,20 @@ type Registry interface {
 	RegisterMatchPlugins(...MatchPlugin) error
 
 	// MockPlugins is used to return storage plugins
-	StoragePlugins() []StoragePlugin
-	// RegisterStoragePlugin is used to register storage plugins
-	RegisterStoragePlugins(...StoragePlugin) error
+	StoragePlugin() StoragePlugin
+	// RegisterStoragePlugin is used to register storage plugin
+	RegisterStoragePlugin(StoragePlugin) error
 }
 
 // BasicRegistry is the basic implementation of pluginRegistry
 type BasicRegistry struct {
 	cfg *Config
 
-	matchPlugins   []MatchPlugin
-	mockPlugins    []MockPlugin
-	storagePlugins []StoragePlugin
-	registerer     prometheus.Registerer
-	lock           sync.Mutex
+	matchPlugins  []MatchPlugin
+	mockPlugins   []MockPlugin
+	storagePlugin StoragePlugin
+	registerer    prometheus.Registerer
+	lock          sync.Mutex
 
 	logger.Logger
 }
@@ -110,14 +110,14 @@ func (b *BasicRegistry) MatchPlugins() []MatchPlugin {
 }
 
 // MockPlugins is used to return storage plugins
-func (b *BasicRegistry) StoragePlugins() []StoragePlugin {
-	return b.storagePlugins
+func (b *BasicRegistry) StoragePlugin() StoragePlugin {
+	return b.storagePlugin
 }
 
 // RegisterStoragePlugin is used to register storage plugins
-func (b *BasicRegistry) RegisterStoragePlugins(plugins ...StoragePlugin) error {
+func (b *BasicRegistry) RegisterStoragePlugin(plugin StoragePlugin) error {
 	b.lock.Lock()
 	defer b.lock.Unlock()
-	b.storagePlugins = append(b.storagePlugins, plugins...)
+	b.storagePlugin = plugin
 	return nil
 }

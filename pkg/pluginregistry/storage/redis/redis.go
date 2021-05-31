@@ -18,13 +18,18 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/pflag"
 
+	"github.com/bilibili-base/powermock/pkg/pluginregistry"
+	"github.com/bilibili-base/powermock/pkg/util"
 	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
+
+var _ pluginregistry.StoragePlugin = &Plugin{}
 
 // Plugin defines a storage plugin with Redis as the backend
 type Plugin struct {
@@ -33,6 +38,8 @@ type Plugin struct {
 	client     *redis.Client
 	registerer prometheus.Registerer
 	logger.Logger
+
+	announcement chan struct{}
 }
 
 // Config defines the config structure
@@ -77,11 +84,12 @@ func (c *Config) Validate() error {
 }
 
 // New is used to init service
-func New(cfg *Config, logger logger.Logger, registerer prometheus.Registerer) (*Plugin, error) {
+func New(cfg *Config, logger logger.Logger, registerer prometheus.Registerer) (pluginregistry.StoragePlugin, error) {
 	s := &Plugin{
-		cfg:        cfg,
-		registerer: registerer,
-		Logger:     logger.NewLogger("redisPlugin"),
+		cfg:          cfg,
+		registerer:   registerer,
+		Logger:       logger.NewLogger("redisPlugin"),
+		announcement: make(chan struct{}, 1),
 	}
 	s.LogInfo(nil, "start to init redis(addr: %s)", cfg.Addr)
 	if err := s.initRedis(); err != nil {
@@ -102,6 +110,11 @@ func (s *Plugin) initRedis() error {
 	return nil
 }
 
+// Start is used to start the plugin
+func (s *Plugin) Start(ctx context.Context, cancelFunc context.CancelFunc) error {
+	return s.watch(ctx, cancelFunc)
+}
+
 // Name is used to return the plugin name
 func (s *Plugin) Name() string {
 	return "redis"
@@ -111,14 +124,20 @@ func (s *Plugin) Name() string {
 func (s *Plugin) Set(ctx context.Context, key string, val string) error {
 	actualKey := s.cfg.Prefix + key
 	s.LogInfo(nil, "redis storage set key: %s", actualKey)
-	return s.client.Set(ctx, actualKey, val, 0).Err()
+	if err := s.client.Set(ctx, actualKey, val, 0).Err(); err != nil {
+		return err
+	}
+	return s.incrRevision(ctx)
 }
 
 // Delete is used to delete specified key
 func (s *Plugin) Delete(ctx context.Context, key string) error {
 	actualKey := s.cfg.Prefix + key
 	s.LogInfo(nil, "redis storage delete key: %s", actualKey)
-	return s.client.Del(ctx, actualKey).Err()
+	if err := s.client.Del(ctx, actualKey).Err(); err != nil {
+		return err
+	}
+	return s.incrRevision(ctx)
 }
 
 // List is used to list all key-val pairs in storage
@@ -128,6 +147,9 @@ func (s *Plugin) List(ctx context.Context) (map[string]string, error) {
 	var keys []string
 	for iterator.Next(ctx) {
 		key := iterator.Val()
+		if GetRevisionKey(s.cfg.Prefix) == key {
+			continue
+		}
 		keys = append(keys, key)
 	}
 	if err := iterator.Err(); err != nil {
@@ -153,4 +175,60 @@ func (s *Plugin) List(ctx context.Context) (map[string]string, error) {
 		data[key] = value
 	}
 	return data, nil
+}
+
+// //////////// Simple Watch Implement ///////////////
+
+func (s *Plugin) incrRevision(ctx context.Context) error {
+	return s.client.Incr(ctx, GetRevisionKey(s.cfg.Prefix)).Err()
+}
+
+func (s *Plugin) getRevision(ctx context.Context) (int64, error) {
+	return s.client.Get(ctx, GetRevisionKey(s.cfg.Prefix)).Int64()
+}
+
+// GetAnnouncement is used to get announcement
+func (s *Plugin) GetAnnouncement() chan struct{} {
+	return s.announcement
+}
+
+func (s *Plugin) watch(ctx context.Context, cancelFunc context.CancelFunc) error {
+	revision, err := s.getRevision(ctx)
+	if err != nil && err != redis.Nil {
+		return err
+	}
+	s.LogInfo(nil, "start to watch redis revisions, current: %d", revision)
+	util.StartServiceAsync(ctx, cancelFunc, s.Logger, func() error {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				got, err := s.getRevision(ctx)
+				if err != nil && err != redis.Nil {
+					s.LogError(nil, "failed to get revision key: %s", err)
+					continue
+				}
+				if revision != got {
+					s.LogInfo(nil, "event found (known %d vs got %d)", revision, got)
+					revision = got
+					select {
+					case s.announcement <- struct{}{}:
+					default:
+					}
+				}
+			case <-ctx.Done():
+				s.LogWarn(nil, "redis stop watching...")
+				return nil
+			}
+		}
+	}, func() error {
+		return nil
+	})
+	return nil
+}
+
+// GetRevisionKey is used to get revision key
+func GetRevisionKey(prefix string) string {
+	return prefix + "__REVISION__"
 }

@@ -53,7 +53,7 @@ func Startup(
 	var (
 		mockPlugins    []pluginregistry.MockPlugin
 		matchPlugins   []pluginregistry.MatchPlugin
-		storagePlugins []pluginregistry.StoragePlugin
+		storagePlugin  pluginregistry.StoragePlugin
 		httpMockServer httpmockserver.Provider
 		gRPCMockServer grpcmockserver.Provider
 	)
@@ -74,11 +74,12 @@ func Startup(
 
 	if cfg.Plugin.Redis.IsEnabled() {
 		log.LogInfo(nil, "* start to create plugin(redis)")
-		storagePlugin, err := pluginredis.New(cfg.Plugin.Redis, log, registerer)
+		plugin, err := pluginredis.New(cfg.Plugin.Redis, log, registerer)
 		if err != nil {
+			log.LogFatal(nil, "failed to create storage plugin(redis): %s", err)
 			return err
 		}
-		storagePlugins = append(storagePlugins, storagePlugin)
+		storagePlugin = plugin
 	}
 
 	if cfg.Plugin.Simple.IsEnabled() {
@@ -139,8 +140,15 @@ func Startup(
 	if err := pluginRegistry.RegisterMatchPlugins(matchPlugins...); err != nil {
 		return err
 	}
-	if err := pluginRegistry.RegisterStoragePlugins(storagePlugins...); err != nil {
+	if err := pluginRegistry.RegisterStoragePlugin(storagePlugin); err != nil {
 		return err
+	}
+
+	if storagePlugin != nil {
+		log.LogInfo(nil, "* start to start storage plugin")
+		if err := storagePlugin.Start(ctx, cancelFunc); err != nil {
+			return err
+		}
 	}
 
 	log.LogInfo(nil, "* start to start apiManager")
