@@ -27,6 +27,7 @@ import (
 
 // Config defines the powermock config with plugins
 type Config struct {
+	MetricsAddress string
 	Log            *logger.Config
 	GRPCMockServer *grpcmockserver.Config
 	HTTPMockServer *httpmockserver.Config
@@ -38,6 +39,7 @@ type Config struct {
 // NewConfig is used to init config with default values
 func NewConfig() *Config {
 	return &Config{
+		MetricsAddress: "0.0.0.0:8081",
 		Log:            logger.NewConfig(),
 		GRPCMockServer: grpcmockserver.NewConfig(),
 		HTTPMockServer: httpmockserver.NewConfig(),
@@ -49,6 +51,7 @@ func NewConfig() *Config {
 
 // RegisterFlagsWithPrefix is used to register flags
 func (c *Config) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
+	f.StringVar(&c.MetricsAddress, prefix+"metrics.address", c.MetricsAddress, "metrics address")
 	c.Log.RegisterFlagsWithPrefix(prefix, f)
 	c.HTTPMockServer.RegisterFlagsWithPrefix(prefix, f)
 	c.GRPCMockServer.RegisterFlagsWithPrefix(prefix, f)

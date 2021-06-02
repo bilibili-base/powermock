@@ -25,3 +25,14 @@ plugin:
         password: ""
         db: 0
         prefix: /powermock/
+    rediscluster:
+        enable: false
+        addresses:
+            - xxx.xx.xx.xx:7028
+            - xxx.xx.xx.xx:7027
+            - xxx.xx.xx.xx:7029
+            - xxx.xx.xx.xx:7029
+            - xxx.xx.xx.xx:7026
+            - xxx.xx.xx.xx:7028
+        password: ""
+        prefix: /powermock/

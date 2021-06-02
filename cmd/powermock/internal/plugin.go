@@ -22,32 +22,36 @@ import (
 	pluginscript "github.com/bilibili-base/powermock/pkg/pluginregistry/script"
 	pluginssimple "github.com/bilibili-base/powermock/pkg/pluginregistry/simple"
 	pluginredis "github.com/bilibili-base/powermock/pkg/pluginregistry/storage/redis"
+	pluginrediscluster "github.com/bilibili-base/powermock/pkg/pluginregistry/storage/rediscluster"
 	"github.com/bilibili-base/powermock/pkg/util"
 )
 
 // PluginConfig defines the plugin config
 type PluginConfig struct {
-	Redis  *pluginredis.Config
-	Simple *pluginssimple.Config
-	GRPC   *pluginsgrpc.Config
-	HTTP   *pluginshttp.Config
-	Script *pluginscript.Config
+	Redis        *pluginredis.Config
+	RedisCluster *pluginrediscluster.Config
+	Simple       *pluginssimple.Config
+	GRPC         *pluginsgrpc.Config
+	HTTP         *pluginshttp.Config
+	Script       *pluginscript.Config
 }
 
 // NewPluginConfig is used to create plugin config
 func NewPluginConfig() *PluginConfig {
 	return &PluginConfig{
-		Redis:  pluginredis.NewConfig(),
-		Simple: pluginssimple.NewConfig(),
-		GRPC:   pluginsgrpc.NewConfig(),
-		HTTP:   pluginshttp.NewConfig(),
-		Script: pluginscript.NewConfig(),
+		Redis:        pluginredis.NewConfig(),
+		RedisCluster: pluginrediscluster.NewConfig(),
+		Simple:       pluginssimple.NewConfig(),
+		GRPC:         pluginsgrpc.NewConfig(),
+		HTTP:         pluginshttp.NewConfig(),
+		Script:       pluginscript.NewConfig(),
 	}
 }
 
 // RegisterFlagsWithPrefix is used to register flags
 func (c *PluginConfig) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) {
 	c.Redis.RegisterFlagsWithPrefix(prefix+"plugin.", f)
+	c.RedisCluster.RegisterFlagsWithPrefix(prefix+"plugin.", f)
 	c.Simple.RegisterFlagsWithPrefix(prefix+"plugin.", f)
 	c.GRPC.RegisterFlagsWithPrefix(prefix+"plugin.", f)
 	c.HTTP.RegisterFlagsWithPrefix(prefix+"plugin.", f)
@@ -58,6 +62,7 @@ func (c *PluginConfig) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) 
 func (c *PluginConfig) Validate() error {
 	return util.ValidateConfigs(
 		c.Redis,
+		c.RedisCluster,
 		c.Simple,
 		c.GRPC,
 		c.HTTP,
