@@ -28,6 +28,8 @@ import (
 	pluginscript "github.com/bilibili-base/powermock/pkg/pluginregistry/script"
 	pluginssimple "github.com/bilibili-base/powermock/pkg/pluginregistry/simple"
 	pluginredis "github.com/bilibili-base/powermock/pkg/pluginregistry/storage/redis"
+	pluginrediscluster "github.com/bilibili-base/powermock/pkg/pluginregistry/storage/rediscluster"
+	"github.com/bilibili-base/powermock/pkg/util"
 	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
 
@@ -77,6 +79,16 @@ func Startup(
 		plugin, err := pluginredis.New(cfg.Plugin.Redis, log, registerer)
 		if err != nil {
 			log.LogFatal(nil, "failed to create storage plugin(redis): %s", err)
+			return err
+		}
+		storagePlugin = plugin
+	}
+
+	if storagePlugin == nil && cfg.Plugin.RedisCluster.IsEnabled() {
+		log.LogInfo(nil, "* start to create plugin(redisCluster)")
+		plugin, err := pluginrediscluster.New(cfg.Plugin.RedisCluster, log, registerer)
+		if err != nil {
+			log.LogFatal(nil, "failed to create storage plugin(redisCluster): %s", err)
 			return err
 		}
 		storagePlugin = plugin
@@ -141,6 +153,12 @@ func Startup(
 		return err
 	}
 	if err := pluginRegistry.RegisterStoragePlugin(storagePlugin); err != nil {
+		return err
+	}
+
+	log.LogInfo(nil, "* start to create metrics server on %s", cfg.MetricsAddress)
+	if err := util.StartMetricsServer(ctx, cancelFunc,
+		log, cfg.MetricsAddress, registerer); err != nil {
 		return err
 	}
 
