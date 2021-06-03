@@ -113,6 +113,11 @@ func (s *MockServer) GetProtoManager() protomanager.Provider {
 
 // Start is used to start the service
 func (s *MockServer) Start(ctx context.Context, cancelFunc context.CancelFunc) error {
+	s.LogInfo(nil, "stating proto manager")
+	if err := s.protoManager.Start(ctx, cancelFunc); err != nil {
+		return err
+	}
+
 	s.LogInfo(nil, "starting gRPC mock server on: %s", s.cfg.Address)
 	server := grpc.NewServer(grpc.UnknownServiceHandler(s.handleStream))
 	listener, err := net.Listen("tcp", s.cfg.Address)
