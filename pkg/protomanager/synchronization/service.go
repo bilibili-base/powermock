@@ -1,4 +1,4 @@
-package synchronize
+package synchronization
 
 import (
 	"bytes"
@@ -69,7 +69,7 @@ func New(cfg *Config, logger logger.Logger, registerer prometheus.Registerer) (*
 	service := &Service{
 		cfg:        cfg,
 		registerer: registerer,
-		Logger:     logger.NewLogger("Service"),
+		Logger:     logger.NewLogger("synchronization"),
 	}
 	return service, nil
 }
