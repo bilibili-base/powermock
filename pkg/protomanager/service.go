@@ -29,7 +29,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/pflag"
 
-	"github.com/bilibili-base/powermock/pkg/protomanager/synchronize"
+	"github.com/bilibili-base/powermock/pkg/protomanager/synchronization"
 	"github.com/bilibili-base/powermock/pkg/util"
 	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
@@ -48,7 +48,7 @@ type Manager struct {
 	// map[name]*desc.MethodDescriptor
 	methods         *sync.Map
 	methodsLock     sync.Mutex
-	synchronization *synchronize.Service
+	synchronization *synchronization.Service
 
 	registerer prometheus.Registerer
 	logger.Logger
@@ -58,7 +58,7 @@ type Manager struct {
 type Config struct {
 	ProtoImportPaths []string
 	ProtoDir         string
-	Synchronization  *synchronize.Config
+	Synchronization  *synchronization.Config
 }
 
 // NewConfig is used to init config with default values
@@ -70,7 +70,7 @@ func NewConfig() *Config {
 	return &Config{
 		ProtoImportPaths: protoImportPaths,
 		ProtoDir:         "./",
-		Synchronization:  synchronize.NewConfig(),
+		Synchronization:  synchronization.NewConfig(),
 	}
 }
 
@@ -98,7 +98,7 @@ func New(cfg *Config, logger logger.Logger, registerer prometheus.Registerer) (*
 		Logger:     logger.NewLogger("protoManager"),
 	}
 	if cfg.Synchronization.Enable {
-		synchronization, err := synchronize.New(cfg.Synchronization, logger, registerer)
+		synchronization, err := synchronization.New(cfg.Synchronization, logger, registerer)
 		if err != nil {
 			return nil, err
 		}
