@@ -24,7 +24,7 @@ jobs:
                   # Destination folder to put binaries in
                   dest: build # optional, default is build
                   # Comma separated targets to build for. Example: windows/amd64,linux/386
-                  targets: "*/*"
+                  targets: "windows/amd64,linux/386,linux/amd64,darwin/386,darwin/amd64"
                   # Prints the names of packages as they are compiled
                   v: false # optional, default is false
                   # Prints the build commands as compilation progresses
