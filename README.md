@@ -393,18 +393,29 @@ starting call mock server
 
 ## 安装
 
+### 通过Go安装
+
+安装普通版本，无Javascript支持：
+```
+go install github.com/bilibili-base/powermock/cmd/powermock
+```
+
+安装V8版本，支持Javascript：
+```
+go install github.com/bilibili-base/powermock/cmd/powermock-v8
+```
+
 ### 开箱即用版本
 
-如果你没有定制插件的需求，开箱即用版本非常适合你。
+如果你没有定制插件的需求，[开箱即用版本](https://github.com/bilibili-base/powermock/releases) 非常适合你。
 
-### 编译
+### 通过Makefile编译
 
-> 为了支持Javascript V8，PowerMock引入了`CGO`，如果你不需要使用`Script插件`，可以手动x修改代码，在 `"cmd/powermock/internal/setup.go"` 中将对 `"github.com/bilibili-base/powermock/pkg/pluginregistry/script"` 的依赖删除掉，这样你就可以十分丝滑的进行 PowerMock 的编译了。
-
-如果你是 `Linux/Darwin/wsl` 的用户，推荐使用 makefile 来进行安装：
+如果你是 `linux/darwin/wsl` 的用户，推荐使用 makefile 来进行安装：
 ```
 ➜ git clone https://github.com/bilibili-base/powermock
 ➜ cd powermock
+➜ make build_linux_v8
 ➜ make build_linux
 ➜ make build_darwin
 ➜ make build_windows
