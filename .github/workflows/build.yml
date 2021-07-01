@@ -16,6 +16,7 @@ jobs:
                 # uses: crazy-max/ghaction-xgo@0bf105240c754748ecfb954a003a7e2ad8518a4b
               uses: crazy-max/ghaction-xgo@v1.6.1
               with:
+                  pkg: cmd/powermock
                   # xgo version
                   xgo_version: latest # optional, default is latest
                   # Go release to use for cross compilation
