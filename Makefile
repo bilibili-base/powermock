@@ -29,10 +29,10 @@ build_linux:
 
 .PHONY: build_windows
 build_windows:
-	rm -fr ./dist/powermock-windows-amd64
+	rm -fr ./dist/powermock-windows-amd64.exe
 	mkdir -p ./dist
-	GOOS="windows"  GOARCH="amd64" CGO_ENABLED=1 go build $(GO_FLAGS) -o ./dist/powermock-windows-amd64   ./cmd/powermock
-	shasum -a 256 ./dist/powermock-windows-amd64  | cut -d ' ' -f 1 > ./dist/powermock-windows-amd64-sha-256
+	GOOS="windows"  GOARCH="amd64" CGO_ENABLED=1 go build $(GO_FLAGS) -o ./dist/powermock-windows-amd64.exe   ./cmd/powermock
+	shasum -a 256 ./dist/powermock-windows-amd64.exe  | cut -d ' ' -f 1 > ./dist/powermock-windows-amd64-sha-256
 
 .PHONY: build_darwin
 build_darwin:
