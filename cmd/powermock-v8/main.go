@@ -23,7 +23,7 @@ import (
 
 	cmdsload "github.com/bilibili-base/powermock/cmd/powermock/subcommands/load"
 	cmdsserve "github.com/bilibili-base/powermock/cmd/powermock/subcommands/serve"
-	bootstrap "github.com/bilibili-base/powermock/pkg/bootstraps/generic"
+	bootstrap "github.com/bilibili-base/powermock/pkg/bootstraps/v8"
 	"github.com/bilibili-base/powermock/pkg/util"
 	"github.com/bilibili-base/powermock/pkg/util/logger"
 )
@@ -46,7 +46,7 @@ var asciiImage = `
                                                         
 ------------------------------------
 Powered by: bilibili
-
+compiled with V8
 `
 
 var cmdRoot = &cobra.Command{

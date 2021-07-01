@@ -16,6 +16,8 @@ package util
 
 import (
 	"fmt"
+
+	"github.com/spf13/pflag"
 )
 
 // CheckErrors is used to check multi errors
@@ -39,6 +41,12 @@ type PluggableConfig interface {
 type ValidatableConfig interface {
 	// Validate is used to validate config and returns error on failure
 	Validate() error
+}
+
+// RegistrableConfig defines the registrable config
+type RegistrableConfig interface {
+	// RegisterFlagsWithPrefix is used to registerer flag with prefix
+	RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet)
 }
 
 // ValidateConfigs is used to validate validatable configs

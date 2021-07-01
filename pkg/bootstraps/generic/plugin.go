@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package internal
+package generic
 
 import (
 	"github.com/spf13/pflag"
 
 	pluginsgrpc "github.com/bilibili-base/powermock/pkg/pluginregistry/grpc"
 	pluginshttp "github.com/bilibili-base/powermock/pkg/pluginregistry/http"
-	pluginscript "github.com/bilibili-base/powermock/pkg/pluginregistry/script"
 	pluginssimple "github.com/bilibili-base/powermock/pkg/pluginregistry/simple"
 	pluginredis "github.com/bilibili-base/powermock/pkg/pluginregistry/storage/redis"
 	pluginrediscluster "github.com/bilibili-base/powermock/pkg/pluginregistry/storage/rediscluster"
@@ -33,7 +32,6 @@ type PluginConfig struct {
 	Simple       *pluginssimple.Config
 	GRPC         *pluginsgrpc.Config
 	HTTP         *pluginshttp.Config
-	Script       *pluginscript.Config
 }
 
 // NewPluginConfig is used to create plugin config
@@ -44,7 +42,6 @@ func NewPluginConfig() *PluginConfig {
 		Simple:       pluginssimple.NewConfig(),
 		GRPC:         pluginsgrpc.NewConfig(),
 		HTTP:         pluginshttp.NewConfig(),
-		Script:       pluginscript.NewConfig(),
 	}
 }
 
@@ -55,7 +52,6 @@ func (c *PluginConfig) RegisterFlagsWithPrefix(prefix string, f *pflag.FlagSet) 
 	c.Simple.RegisterFlagsWithPrefix(prefix+"plugin.", f)
 	c.GRPC.RegisterFlagsWithPrefix(prefix+"plugin.", f)
 	c.HTTP.RegisterFlagsWithPrefix(prefix+"plugin.", f)
-	c.Script.RegisterFlagsWithPrefix(prefix+"plugin.", f)
 }
 
 // Validate is used to validate config and returns error on failure
@@ -66,6 +62,5 @@ func (c *PluginConfig) Validate() error {
 		c.Simple,
 		c.GRPC,
 		c.HTTP,
-		c.Script,
 	)
 }

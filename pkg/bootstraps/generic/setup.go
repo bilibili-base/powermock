@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package internal
+package generic
 
 import (
 	"context"
@@ -25,7 +25,6 @@ import (
 	"github.com/bilibili-base/powermock/pkg/pluginregistry"
 	pluginsgrpc "github.com/bilibili-base/powermock/pkg/pluginregistry/grpc"
 	pluginshttp "github.com/bilibili-base/powermock/pkg/pluginregistry/http"
-	pluginscript "github.com/bilibili-base/powermock/pkg/pluginregistry/script"
 	pluginssimple "github.com/bilibili-base/powermock/pkg/pluginregistry/simple"
 	pluginredis "github.com/bilibili-base/powermock/pkg/pluginregistry/storage/redis"
 	pluginrediscluster "github.com/bilibili-base/powermock/pkg/pluginregistry/storage/rediscluster"
@@ -102,16 +101,6 @@ func Startup(
 		}
 		mockPlugins = append(mockPlugins, simplePlugin)
 		matchPlugins = append(matchPlugins, simplePlugin)
-	}
-
-	if cfg.Plugin.Script.IsEnabled() {
-		log.LogInfo(nil, "* start to create plugin(script)")
-		scriptPlugin, err := pluginscript.New(cfg.Plugin.Script, log, registerer)
-		if err != nil {
-			return err
-		}
-		mockPlugins = append(mockPlugins, scriptPlugin)
-		matchPlugins = append(matchPlugins, scriptPlugin)
 	}
 
 	if cfg.GRPCMockServer.IsEnabled() {

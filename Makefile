@@ -11,6 +11,14 @@ build:
 	make build_linux
 	make build_windows
 	make build_darwin
+	make build_linux_v8
+
+.PHONY: build_linux_v8
+build_linux_v8:
+	rm -fr ./dist/powermock-v8-linux-amd64
+	mkdir -p ./dist
+	GOOS="linux"  GOARCH="amd64" CGO_ENABLED=1 go build $(GO_FLAGS) -o ./dist/powermock-v8-linux-amd64   ./cmd/powermock-v8
+	shasum -a 256 ./dist/powermock-v8-linux-amd64  | cut -d ' ' -f 1 > ./dist/powermock-v8-linux-amd64-sha-256
 
 .PHONY: build_linux
 build_linux:

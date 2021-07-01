@@ -40,6 +40,7 @@ PowerMock是一个Mock Server的实现，它同时支持HTTP与gRPC协议接口�
 ### 一、较为高级的用法
 
 > 本示例可以在 [示例代码](./examples/advanced) 找到对应资料
+> 本示例必须使用v8版本的powermock，才能完整支持Javascript的功能
 
 以下面这份配置为示例：
 
@@ -230,7 +231,7 @@ cases:
 
 然后运行：
 ```
-➜ ./powermock load --address=127.0.0.1:30000 --file apis.yaml
+➜ ./powermock load --address=127.0.0.1:30000 apis.yaml
 2:32PM INF start to load file component=main file=load.go:59
 2:32PM INF mock apis loaded from file component=main count=1 file=load.go:64
 2:32PM INF start to save api component=main file=load.go:76 host= method=GET path=/hello uniqueKey=hello
@@ -340,7 +341,7 @@ cases:
 ```
 可以看到，里面添加了一个名为 "hello_example_gRPC" 的 MockAPI，我们通过下面的命令装载它：
 ```
-➜ powermock load --file apis.yaml  --address=127.0.0.1:30000
+➜ powermock load --address=127.0.0.1:30000  apis.yaml
 3:06PM INF start to load file component=main file=load.go:59
 3:06PM INF mock apis loaded from file component=main count=2 file=load.go:64
 3:06PM INF start to save api component=main file=load.go:76 host= method=GET path=/hello uniqueKey=hello_example_http

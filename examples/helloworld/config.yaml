@@ -18,7 +18,6 @@ plugin:
     simple: { }
     grpc: { }
     http: { }
-    script: { }
     redis:
         enable: false
         addr: 127.0.0.1:6379
