@@ -18,8 +18,9 @@ PowerMock是一个Mock Server的实现，它同时支持HTTP与gRPC协议接口�
       - [1. 先Mock一个HTTP接口](#1-先mock一个http接口)
       - [2. 再mock一个gRPC接口](#2-再mock一个grpc接口)
   - [安装](#安装)
+    - [通过Go安装](#通过Go安装)
     - [开箱即用版本](#开箱即用版本)
-    - [编译](#编译)
+    - [通过Makefile编译](#通过Makefile编译)
 
 ## 功能
 
