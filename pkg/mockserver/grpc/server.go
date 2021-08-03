@@ -186,7 +186,7 @@ func (s *MockServer) handleStream(srv interface{}, stream grpc.ServerStream) err
 
 	stream.SetTrailer(metadata.New(response.Trailer))
 	if err := stream.SetHeader(metadata.New(response.Header)); err != nil {
-		panic(err)
+		return status.Errorf(codes.Unavailable, "failed to set header: %s", err)
 	}
 	if response.Code != 0 {
 		return status.Errorf(codes.Code(response.Code), "expected code is: %d", response.Code)
