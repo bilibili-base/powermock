@@ -398,12 +398,12 @@ starting call mock server
 
 安装普通版本，无Javascript支持：
 ```
-go install github.com/bilibili-base/powermock/cmd/powermock
+go install github.com/bilibili-base/powermock/cmd/powermock@latest
 ```
 
 安装V8版本，支持Javascript：
 ```
-go install github.com/bilibili-base/powermock/cmd/powermock-v8
+go install github.com/bilibili-base/powermock/cmd/powermock-v8@latest
 ```
 
 ### 开箱即用版本
