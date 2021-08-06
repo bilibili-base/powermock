@@ -183,10 +183,11 @@ func (s *MockServer) handleStream(srv interface{}, stream grpc.ServerStream) err
 	if err != nil {
 		return err
 	}
-
 	stream.SetTrailer(metadata.New(response.Trailer))
-	if err := stream.SetHeader(metadata.New(response.Header)); err != nil {
-		return status.Errorf(codes.Unavailable, "failed to set header: %s", err)
+	if len(response.Header) > 0 {
+		if err := stream.SetHeader(metadata.New(response.Header)); err != nil {
+			return status.Errorf(codes.Unavailable, "failed to set header: %s", err)
+		}
 	}
 	if response.Code != 0 {
 		return status.Errorf(codes.Code(response.Code), "expected code is: %d", response.Code)
