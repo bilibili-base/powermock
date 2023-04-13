@@ -43,7 +43,7 @@ func RenderWithRequest(ctx *Context, path string) string {
 	if err != nil {
 		return ""
 	}
-	return gjson.GetBytes(data, path).Str
+	return gjson.GetBytes(data, path).String()
 }
 
 // RenderWithRequest is used to render $mock... variable

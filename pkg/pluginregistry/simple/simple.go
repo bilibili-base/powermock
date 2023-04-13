@@ -87,35 +87,45 @@ func (s *Plugin) Name() string {
 }
 
 // Match is used to determine whether interact.Request satisfies the matching condition of MockAPI_Condition
-func (s *Plugin) Match(ctx context.Context, request *interact.Request, condition *v1alpha1.MockAPI_Condition) (match bool, err error) {
+func (s *Plugin) Match(ctx context.Context, request *interact.Request, condition *v1alpha1.MockAPI_Condition) (bool, error) {
 	simple := condition.GetSimple()
 	if simple == nil {
 		return false, nil
 	}
+
+	var (
+		matched, err = false, error(nil)
+	)
 	c := core.NewContext(request)
 	for _, item := range simple.Items {
 		operandX := core.Render(c, item.OperandX)
 		operandY := core.Render(c, item.OperandY)
-		matched, err := core.Match(operandX, item.Operator, operandY)
+		matched, err = core.Match(operandX, item.Operator, operandY)
 		if err != nil {
 			return false, err
 		}
 		if item.Opposite {
 			matched = !matched
 		}
-		if matched {
-			if simple.UseOrAmongItems {
-				return true, nil
-			}
-			continue
-		} else {
-			if simple.UseOrAmongItems {
-				continue
-			}
-			return false, nil
+		// if matched {
+		// 	if simple.UseOrAmongItems {
+		// 		return true, nil
+		// 	}
+		// 	continue
+		// } else {
+		// 	if simple.UseOrAmongItems {
+		// 		continue
+		// 	}
+		// 	return false, nil
+		// }
+		//1. false && And return false
+		//2. true && Or return true
+		if (!matched && !simple.UseOrAmongItems) ||
+			(matched && simple.UseOrAmongItems) {
+			return matched, nil
 		}
 	}
-	return true, nil
+	return matched, nil
 }
 
 // MockResponse is used to generate interact.Response according to the given MockAPI_Response and interact.Request

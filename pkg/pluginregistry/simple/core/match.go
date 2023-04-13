@@ -16,8 +16,10 @@ package core
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -33,9 +35,12 @@ func Float64(val string) float64 {
 
 // Match is used to perform the operation of operator (operandX, operandY)
 func Match(operandX string, operator string, operandY string) (bool, error) {
+	log.Println(operandX, operator, operandY)
 	switch operator {
 	case "=", "==", "===":
 		return operandX == operandY, nil
+	case "!=":
+		return operandX != operandY, nil
 	case ">":
 		return Float64(operandX) > Float64(operandY), nil
 	case ">=":
@@ -51,6 +56,8 @@ func Match(operandX string, operator string, operandY string) (bool, error) {
 			return false, nil
 		}
 		return expr.MatchString(operandX), nil
+	case "in":
+		return strings.Contains(operandY, operandX), nil
 	default:
 		return false, fmt.Errorf("unknown operator: %s", operator)
 	}
