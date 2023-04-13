@@ -12,15 +12,16 @@ PowerMock是一个Mock Server的实现，它同时支持HTTP与gRPC协议接口�
   - [功能](#功能)
   - [示例](#示例)
     - [一、较为高级的用法](#一较为高级的用法)
+      - [0 TIPS](#0-tips)
       - [1. 条件场景一](#1-条件场景一)
       - [2. 条件场景二](#2-条件场景二)
     - [二、从Hello World开始吧](#二从hello-world开始吧)
       - [1. 先Mock一个HTTP接口](#1-先mock一个http接口)
       - [2. 再mock一个gRPC接口](#2-再mock一个grpc接口)
   - [安装](#安装)
-    - [通过Go安装](#通过Go安装)
+    - [通过Go安装](#通过go安装)
     - [开箱即用版本](#开箱即用版本)
-    - [通过Makefile编译](#通过Makefile编译)
+    - [通过Makefile编译](#通过makefile编译)
 
 ## 功能
 
@@ -56,6 +57,8 @@ cases:
           - operandX: "$request.header.uid"
             operator: "<="
             operandY: "1000"
+            # 反转判断结果
+            opposite: true
     response:
       simple:
         header:
@@ -96,6 +99,21 @@ cases:
               }
           })()
 ```
+#### 0 TIPS
+condition可用字段说明
+
+| 字段 | 类型 | 备注 |
+| -- | -- | -- |
+| items | []Item | 用来运算的数据项 |
+| useOrAmongItems | bool |  运算数据项间的逻辑关系，or/and|
+
+Item
+| 字段 | 类型 | 备注 |
+| -- | -- | -- |
+| operandX | string | 输入值 |
+| operandY | string | 运算值 |
+| opposite | bool | 运算结果反转，相当加了个非门 |
+| operator | string | 运算符，=,\==,===、!=,>,>=,<,<=,regex,in等 |
 
 这份配置定义了一个`MockAPI`，用于匹配所有路径为 `/examples.greeter.api.Greeter/Hello`，方法为 `POST` 的请求，它包含了两个场景，能够实现这样的效果：
 

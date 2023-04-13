@@ -16,7 +16,6 @@ package core
 
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -35,7 +34,6 @@ func Float64(val string) float64 {
 
 // Match is used to perform the operation of operator (operandX, operandY)
 func Match(operandX string, operator string, operandY string) (bool, error) {
-	log.Println(operandX, operator, operandY)
 	switch operator {
 	case "=", "==", "===":
 		return operandX == operandY, nil
