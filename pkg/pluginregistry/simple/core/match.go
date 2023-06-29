@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -36,6 +37,8 @@ func Match(operandX string, operator string, operandY string) (bool, error) {
 	switch operator {
 	case "=", "==", "===":
 		return operandX == operandY, nil
+	case "!=":
+		return operandX != operandY, nil
 	case ">":
 		return Float64(operandX) > Float64(operandY), nil
 	case ">=":
@@ -51,6 +54,8 @@ func Match(operandX string, operator string, operandY string) (bool, error) {
 			return false, nil
 		}
 		return expr.MatchString(operandX), nil
+	case "in":
+		return strings.Contains(operandY, operandX), nil
 	default:
 		return false, fmt.Errorf("unknown operator: %s", operator)
 	}
