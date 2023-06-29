@@ -34,6 +34,7 @@ import (
 	"github.com/bilibili-base/powermock/pkg/protomanager"
 	"github.com/bilibili-base/powermock/pkg/util"
 	"github.com/bilibili-base/powermock/pkg/util/logger"
+	_ "google.golang.org/grpc/encoding/gzip"
 )
 
 // Provider defines the mock server interface
